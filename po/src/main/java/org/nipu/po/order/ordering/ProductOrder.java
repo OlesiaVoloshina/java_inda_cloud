@@ -1,4 +1,4 @@
-package org.nipu.po.order;
+package org.nipu.po.order.ordering;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,5 +17,6 @@ public class ProductOrder {
     @Id
     private String id;
     private String specificationId;
+    private String userId;
     private Long quantity;
 }

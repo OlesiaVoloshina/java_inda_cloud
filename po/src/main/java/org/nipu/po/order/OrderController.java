@@ -1,6 +1,12 @@
 package org.nipu.po.order;
 
-import org.nipu.po.order.clients.ProductSpecificationRepository;
+import org.nipu.po.order.clients.products.ProductSpecificationRepository;
+import org.nipu.po.order.clients.users.UserData;
+import org.nipu.po.order.clients.users.UserSpecificationRepository;
+import org.nipu.po.order.ordering.ProductOrder;
+import org.nipu.po.order.ordering.ProductOrderRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,18 +19,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OrderController {
     private final ProductOrderRepository orderRepository;
-    private final ProductSpecificationRepository specificationRepository;
+    private final ProductSpecificationRepository productSpecificationRepository;
+    private final UserSpecificationRepository userSpecificationRepository;
 
-    public OrderController(ProductOrderRepository orderRepository, ProductSpecificationRepository specificationRepository) {
+    public OrderController(ProductOrderRepository orderRepository, ProductSpecificationRepository productSpecificationRepository, UserSpecificationRepository userSpecificationRepository) {
         this.orderRepository = orderRepository;
-        this.specificationRepository = specificationRepository;
+        this.productSpecificationRepository = productSpecificationRepository;
+        this.userSpecificationRepository = userSpecificationRepository;
     }
 
     @PutMapping("/catalog/{specificationId}/order")
     public ProductOrder orderProductBySpecificationId(@PathVariable String specificationId) {
-        if (specificationRepository.existsById(specificationId) == null) {
+        // fetch product from product microservice
+        if (productSpecificationRepository.existsById(specificationId) == null) {
             throw new RuntimeException("There is no product specification with Id: " + specificationId);
         }
-        return orderRepository.save(new ProductOrder(null, specificationId, 1l));
+        // use data from token to get user auth data, exchange them on user details and attach these details to order
+        User user  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // provide auth token to feign client
+        UserData userData = userSpecificationRepository.getUserByLogin(user.getUsername(), "Bearer " + user.getPassword());
+        if (userData == null) {
+            throw new RuntimeException("There is no user with login: " + user.getUsername());
+        }
+
+        System.out.println("------------------- ORDER BY USER: " + userData);
+        return orderRepository.save(new ProductOrder(null, specificationId, userData.getId(), 1L));
     }
 }

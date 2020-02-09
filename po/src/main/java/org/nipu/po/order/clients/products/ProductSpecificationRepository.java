@@ -1,4 +1,4 @@
-package org.nipu.po.order.clients;
+package org.nipu.po.order.clients.products;
 
 import org.nipu.po.FeignConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  *
  * @author Nikita_Puzankov
  */
-@FeignClient(name = "catalog", url = "localhost:8081", configuration = FeignConfiguration.class)
+@FeignClient(name = "product-service", configuration = FeignConfiguration.class, fallback = FallbackProductSpecificationRepository.class)
 public interface ProductSpecificationRepository {
 
     @RequestMapping(method = RequestMethod.GET, path = "/catalog/{specificationId}")
