@@ -1,0 +1,357 @@
+{
+	"info": {
+		"_postman_id": "7b98df3e-b4b9-4669-b5ac-25d4214ffd33",
+		"name": "Microservices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "API GW REGISTER USER",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"New user\",\n\t\"login\": \"user\",\n\t\"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth-service/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth-service",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW OAUTH TOKEN",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a44205e0-d4e9-44e8-a6d2-1c2e9c1cd5bd",
+						"exec": [
+							"// Parsing the response returned by the request.",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Extracting the token from the response and setting it as a global variable.",
+							"pm.globals.set(\"AUTH_TOKEN\", jsonData['access_token']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic Y2xpZW50OnNlY3JldA=="
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth-service/oauth/token?grant_type=password&username=user&password=password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth-service",
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "grant_type",
+							"value": "password"
+						},
+						{
+							"key": "username",
+							"value": "user"
+						},
+						{
+							"key": "password",
+							"value": "password"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW OAUTH CHECK TOKEN",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Basic Y2xpZW50OnNlY3JldA=="
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth-service/oauth/token?grant_type=password&username=user&password=pass",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth-service",
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "grant_type",
+							"value": "password"
+						},
+						{
+							"key": "username",
+							"value": "user"
+						},
+						{
+							"key": "password",
+							"value": "pass"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW GET USER",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"New user\",\n\t\"login\": \"user\",\n\t\"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth-service/user/by-login/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth-service",
+						"user",
+						"by-login",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW GET USER Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"New user\",\n\t\"login\": \"user\",\n\t\"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth-service/user/by-login/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auth-service",
+						"user",
+						"by-login",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW GET PRODUCT",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/product-service/catalog/5e3e831936a16b33a4fcf250",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"product-service",
+						"catalog",
+						"5e3e831936a16b33a4fcf250"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW GET ALL PRODUCTS",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{AUTH_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/product-service/catalog",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"product-service",
+						"catalog"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW ADD PRODUCT",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Internet3\",\n\t\"price\": 500\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/product-service/catalog",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"product-service",
+						"catalog"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API GW ORDER PRODUCT",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{AUTH_TOKEN}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/order-service/catalog/5e3e831936a16b33a4fcf250/order",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"order-service",
+						"catalog",
+						"5e3e831936a16b33a4fcf250",
+						"order"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
