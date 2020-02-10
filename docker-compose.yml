@@ -1,10 +1,101 @@
 version: '2'
 
 services:
+#  eureka:
+#    image: springcloud/eureka
+#    ports:
+#      - "8761:8761"
   mongo:
     image: mongo
     ports:
       - "27017:27017"
+# my service discovery
+  sd:
+    build: sd/
+    ports:
+      - '8761:8761'
+      - '5010:5005'
+    environment:
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
+ # authorization server
+  auth:
+    build: auth/
+    ports:
+      - '8081:8080'
+      - '5011:5005'
+    links:
+      - sd
+      - mongo
+    depends_on:
+      - sd
+      - mongo
+    environment:
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
+  # API gateway
+  apigw:
+    build: apigw/
+    ports:
+      - '8080:8080'
+      - '5012:5005'
+    links:
+      - sd
+      - auth
+    depends_on:
+      - sd
+      - auth
+    environment:
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
+      security_oauth2_client_resource_tokenInfoUri: 'http://apigw:8080/api/auth-service/oauth/check_token'
+  # product service
+  pc:
+    build: pc/
+    ports:
+      - '8083:8080'
+      - '5013:5005'
+    depends_on:
+      - sd
+      - mongo
+    links:
+      - sd
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongo
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
+  pc_2:
+    build: pc/
+    hostname: pc_2
+    ports:
+      - '8085:8080'
+      - '5015:5005'
+    depends_on:
+      - sd
+      - mongo
+    links:
+      - sd
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongo
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
+  # order service
+  po:
+    build: po/
+    ports:
+      - '8084:8080'
+      - '5014:5005'
+    links:
+      - pc
+      - sd
+    depends_on:
+      - sd
+      - mongo
+      - pc
+      - auth
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongo
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: 'http://sd:8761/eureka/'
 networks:
-    default:
-        driver: bridge
+  default:
+    driver: bridge
