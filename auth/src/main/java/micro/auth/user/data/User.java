@@ -13,8 +13,6 @@ public class User {
     private String id;
     private String name;
     private UserRole role;
-
-    @Indexed(unique = true)
     private String login;
     private String password;
 
